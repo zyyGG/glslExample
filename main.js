@@ -85,7 +85,7 @@ class Canvas {
 
     this.canvasContainer.appendChild(this.canvas);
     // 初始化gl
-    this.gl = this.canvas.getContext("webgl");
+    this.gl = this.canvas.getContext("webgl2");
     if (!this.gl) {
       console.error("WebGL not supported, falling back on experimental-webgl");
       this.gl = this.canvas.getContext("experimental-webgl");
@@ -215,7 +215,9 @@ class Canvas {
 
   destory(){
     this.gl.deleteProgram(this.program);
-    document.querySelector(".canvas-container").removeChild(this.canvas);
+    if(this.canvas){
+      document.querySelector(".canvas-container")?.removeChild(this.canvas);
+    }
   }
 }
 
@@ -237,7 +239,9 @@ render(0);
 // 处理点击事件
 async function handleClick(item){
   canvas.destory();
-  const fragmentShader = await fetch(item.path).then(res => res.text());
+  let fragmentShader = await fetch(item.path).then(res => res.text());
+  fragmentShader = await handleInclude(fragmentShader)
+
   canvas = new Canvas({
     fragmentShader,
   });
@@ -246,6 +250,32 @@ async function handleClick(item){
   const url = new URL(window.location.href);
   url.searchParams.set("info", JSON.stringify(item).trim());
   window.history.pushState({}, "", url.href);
+}
+
+async function handleInclude(fragmentShader){
+  const includeReg = /^\s*#include.*$/gm;
+  const matches = fragmentShader.match(includeReg);
+
+  if(matches && (matches.length > 0)){
+    for(let i = 0; i < matches.length; i++){
+      const item = matches[i];
+       // 获取"""中间的路径
+       let libPath = item.match(/"(.*)"/)[1];
+       // 把相对路径转换为绝对路径
+       if(libPath.startsWith("./")){
+         libPath = libPath.replace(/^\.\//, "fragment/");
+       } else if(libPath.startsWith("../")){
+         libPath = libPath.replace(/^(\.\.\/)/, "/");
+       } else {
+         libPath = "fragment/" + libPath;
+       }
+       const res = await fetch(libPath).then(res => res.text());
+       fragmentShader = fragmentShader.replace(item, `\n${res}\n`)
+    }
+    // 这里再次执行替换，防止include文件也include了其他的文件
+    fragmentShader = await handleInclude(fragmentShader)
+  }
+  return fragmentShader;
 }
 
 // 处理url路由
