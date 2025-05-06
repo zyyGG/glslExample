@@ -1,6 +1,6 @@
 # 如何使用？
 
-![example](public/example.jpg)
+![example](./public/example.jpg)
 
 1. git clone https://github.com/zyyGG/glslExample.git
 2. cd glslExample
