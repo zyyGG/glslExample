@@ -81,11 +81,15 @@ class Canvas {
     this.canvas.height = this.height;
     this.canvas.style.width = this.width + "px";
     this.canvas.style.height = this.height + "px";
-    this.canvas.style.backgroundColor = "#000"; // 背景色
+    this.canvas.style.backgroundColor = "#3e3e3e"; // 背景色
 
     this.canvasContainer.appendChild(this.canvas);
     // 初始化gl
     this.gl = this.canvas.getContext("webgl2");
+    // 开启透明
+    this.gl.clearColor(0.0, 0.0, 0.0, 1.0);
+    this.gl.enable(this.gl.BLEND);
+    this.gl.blendFunc(this.gl.SRC_ALPHA, this.gl.ONE_MINUS_SRC_ALPHA);
     if (!this.gl) {
       console.error("WebGL not supported, falling back on experimental-webgl");
       this.gl = this.canvas.getContext("experimental-webgl");
@@ -193,7 +197,7 @@ class Canvas {
     if (success) {
       return shader;
     }
-    console.error(this.gl.getShaderInfoLog(shader));
+    console.log(this.gl.getShaderInfoLog(shader));
     this.gl.deleteShader(shader);
   }
   #createProgram(vertexShader, fragmentShader) {
@@ -214,10 +218,15 @@ class Canvas {
   }
 
   destory(){
-    this.gl.deleteProgram(this.program);
-    if(this.canvas){
-      document.querySelector(".canvas-container")?.removeChild(this.canvas);
+    try{
+      this.gl.deleteProgram(this.program);
+      if(this.canvas){
+        document.querySelector(".canvas-container").innerHTML = ""
+      }
+    } catch(error){
+      console.log("destory error", error)
     }
+    
   }
 }
 
@@ -239,17 +248,22 @@ render(0);
 // 处理点击事件
 async function handleClick(item){
   canvas.destory();
-  let fragmentShader = await fetch(item.path).then(res => res.text());
-  fragmentShader = await handleInclude(fragmentShader)
-
-  canvas = new Canvas({
-    fragmentShader,
-  });
-
-  // url路由增加信息
-  const url = new URL(window.location.href);
-  url.searchParams.set("info", JSON.stringify(item).trim());
-  window.history.pushState({}, "", url.href);
+  try {
+    let fragmentShader = await fetch(item.path).then(res => res.text());
+    fragmentShader = await handleInclude(fragmentShader)
+  
+    canvas = new Canvas({
+      fragmentShader,
+    });
+  
+    // url路由增加信息
+    const url = new URL(window.location.href);
+    url.searchParams.set("info", JSON.stringify(item).trim());
+    window.history.pushState({}, "", url.href);
+  }catch(err){
+    console.log(err)
+  }
+ 
 }
 
 async function handleInclude(fragmentShader){
