@@ -103,6 +103,7 @@ class Canvas {
   size = 2;
   vertexShader = `
   attribute vec2 a_position;
+  attribute vec2 a_texCoord;
 
   void main() {
     vec2 zeroToOne = a_position;
@@ -160,6 +161,7 @@ class Canvas {
 
     this.canvas.addEventListener("mousemove", (e) => {
       this.uniforms.u_mouse.value = [e.offsetX, this.height - e.offsetY]; // y轴反转
+      // console.log(this.uniforms.u_mouse.value)
     })
     
 
@@ -244,6 +246,21 @@ class Canvas {
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(position), this.gl.STATIC_DRAW) // 将数据传入缓冲区 
     this.size = 2
     this.gl.vertexAttribPointer(positionAttributeLocation, this.size, this.gl.FLOAT, false, 0, 0) // 传入数据
+    
+    // 创建图片缓冲区
+    const image = new Image();
+    image.src = "/src/assets/leaves.jpg"; // 设置图片路径
+    image.onload = () => {
+      // 图像数据y轴翻转
+      this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
+      const texture = this.gl.createTexture();
+      this.gl.bindTexture(this.gl.TEXTURE_2D, texture);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_S, this.gl.CLAMP_TO_EDGE);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_WRAP_T, this.gl.CLAMP_TO_EDGE);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MIN_FILTER, this.gl.NEAREST);
+      this.gl.texParameteri(this.gl.TEXTURE_2D, this.gl.TEXTURE_MAG_FILTER, this.gl.NEAREST);
+      this.gl.texImage2D(this.gl.TEXTURE_2D, 0, this.gl.RGBA, this.gl.RGBA, this.gl.UNSIGNED_BYTE, image);
+    };
   }
 
   #createShader(type, source) {
