@@ -16,5 +16,6 @@ export default defineConfig({
     minify: false,                  // Minify/optimize output shader code
     watch: true,                    // Recompile shader on change
     root: '/public/fragment'                    // Directory for root imports
-  })]
+  })],
+  base: "./"
 });
