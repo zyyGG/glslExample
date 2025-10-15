@@ -3,7 +3,6 @@ const fileObject = import.meta.glob("./public/fragment/**");
 // 获取所有的fileObject
 function getFileList() {
   const list = [];
-  console.log(import.meta.env.MODE)
   for (const key in fileObject) {
     const element = fileObject[key];
     // 匹配shader文件
@@ -17,13 +16,12 @@ function getFileList() {
       });
     }
   }
-  console.log(list)
   return list;
 }
 
 function createExampleListElement(list) {
   const exampleList = document.querySelector(".example-list");
-  exampleList.innerHTML = ""; // 清空列表
+  // exampleList.innerHTML = ""; // 清空列表
   list.forEach((item) => {
     const exampleItem = document.createElement("div");
     exampleItem.className = "example-item";
@@ -36,7 +34,34 @@ function createExampleListElement(list) {
   });
 }
 
+// 初始化事件
+function initEvents(){
+  const toggleExpandBtn = document.getElementById("toggleExpandBtn");
+  toggleExpandBtn.addEventListener("click", handleExpand);
+}
+function initCssVariable(){
+  document.body.style.setProperty("--example-list-width", "200px");
+}
+
+// 初始化
+function init(){
+  initCssVariable();
+  initEvents();
+}
+
+function handleExpand(){
+  const width = document.body.style.getPropertyValue("--example-list-width")
+  document.body.style.setProperty("--example-list-width", width === "200px" ? "700px" : "200px");
+  document.querySelector(".example-list").classList.toggle("expanded")
+}
+
+function closeExpand(){
+  document.body.style.setProperty("--example-list-width", "200px");
+  document.querySelector(".example-list").classList.remove("expanded")
+}
+
 createExampleListElement(getFileList());
+init()
 
 class Canvas {
   gl = null;
@@ -268,6 +293,8 @@ async function handleClick(item){
   }catch(err){
     console.log(err)
   }
+
+  closeExpand()
  
 }
 
