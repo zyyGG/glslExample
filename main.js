@@ -104,6 +104,10 @@ class Canvas {
     this.#init();
     // this.uniforms = options.uniforms || this.uniforms;
     // this.draw(true)
+
+    this.canvas.addEventListener("mousemove", (e) => {
+      this.uniforms.u_mouse.value = [e.offsetX, this.height - e.offsetY]; // y轴反转
+    })
     
 
     // window增加onsize处理
@@ -226,7 +230,6 @@ class Canvas {
     } catch(error){
       console.log("destory error", error)
     }
-    
   }
 }
 
