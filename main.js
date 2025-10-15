@@ -38,7 +38,12 @@ function createExampleListElement(list) {
 function initEvents(){
   const toggleExpandBtn = document.getElementById("toggleExpandBtn");
   toggleExpandBtn.addEventListener("click", handleExpand);
+
+  // 为搜索条增加事件
+  const searchInput = document.getElementById("searchInput");
+  searchInput.addEventListener("input", handleSearch);
 }
+// 初始化css变量
 function initCssVariable(){
   document.body.style.setProperty("--example-list-width", "200px");
 }
@@ -49,10 +54,33 @@ function init(){
   initEvents();
 }
 
+// 触发展示事件 
 function handleExpand(){
   const width = document.body.style.getPropertyValue("--example-list-width")
   document.body.style.setProperty("--example-list-width", width === "200px" ? "700px" : "200px");
   document.querySelector(".example-list").classList.toggle("expanded")
+}
+
+let searchTimer = null;
+
+// 触发搜索事件
+function handleSearch(e){
+  if(searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    const value = e.target.value.toLowerCase();
+    const exampleItems = document.querySelectorAll(".example-item");
+    const exampleList = document.querySelector(".example-list");
+    // 清空列表
+    exampleItems.forEach(item => item.remove());
+
+
+    if(value == ''){
+      createExampleListElement(list);
+    } else {
+      const filterList = list.filter(item => item.name.toLowerCase().includes(value));
+      createExampleListElement(filterList);
+    }
+  }, 300);
 }
 
 function closeExpand(){
@@ -60,7 +88,8 @@ function closeExpand(){
   document.querySelector(".example-list").classList.remove("expanded")
 }
 
-createExampleListElement(getFileList());
+const list = getFileList();
+createExampleListElement(list);
 init()
 
 class Canvas {

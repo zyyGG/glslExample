@@ -38,6 +38,7 @@ body{
 .example-list.expanded {
   display: grid;
   grid-template-columns: 1fr 1fr 1fr;
+  place-content: start;
   grid-gap: 8px;
 }
 
