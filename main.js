@@ -17,6 +17,7 @@ function getFileList() {
       });
     }
   }
+  console.log(list)
   return list;
 }
 
@@ -252,9 +253,8 @@ render(0);
 // 处理点击事件
 async function handleClick(item){
   canvas.destory();
-  console.log(path)
   try {
-    let fragmentShader = await fetch(path).then(res => res.text());
+    let fragmentShader = await fetch(item.path).then(res => res.text());
     fragmentShader = await handleInclude(fragmentShader)
   
     canvas = new Canvas({
