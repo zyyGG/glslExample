@@ -10,7 +10,7 @@ function getFileList() {
       const filePath = element.name.replace(/^(\.\/public)/, "");
       const fileName = filePath.split("/").pop().split(".")[0];
       list.push({
-        name: import.meta.env.MODE === "development" ? fileName : `/glslExample/${fileName}`,
+        name: fileName,
         path: import.meta.env.MODE === "development" ? filePath : `/glslExample${filePath.replace(/^\./, "")}`,
         img: import.meta.env.MODE === "development" ? `/images/${fileName}.png` : `/glslExample/images/${fileName}.png`,
       });
@@ -69,11 +69,8 @@ function handleSearch(e){
   searchTimer = setTimeout(() => {
     const value = e.target.value.toLowerCase();
     const exampleItems = document.querySelectorAll(".example-item");
-    const exampleList = document.querySelector(".example-list");
     // 清空列表
     exampleItems.forEach(item => item.remove());
-
-
     if(value == ''){
       createExampleListElement(list);
     } else {
