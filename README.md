@@ -2,10 +2,7 @@
 
 ![example](./public/example.jpg)
 
-1. git clone https://github.com/zyyGG/glslExample.git
-2. cd glslExample
-3. npm install
-4. npm run dev
+预览页面--->[https://zyygg.github.io/glslExample/index.html](https://zyygg.github.io/glslExample/index.html)
 
 ## 文件结构
 

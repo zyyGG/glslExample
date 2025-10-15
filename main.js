@@ -3,6 +3,7 @@ const fileObject = import.meta.glob("./public/fragment/**");
 // 获取所有的fileObject
 function getFileList() {
   const list = [];
+  console.log(import.meta.env.MODE)
   for (const key in fileObject) {
     const element = fileObject[key];
     // 匹配shader文件
@@ -10,9 +11,9 @@ function getFileList() {
       const filePath = element.name.replace(/^(\.\/public)/, "");
       const fileName = filePath.split("/").pop().split(".")[0];
       list.push({
-        name: fileName,
-        path: filePath,
-        img: `/images/${fileName}.png`,
+        name: import.meta.env.MODE === "development" ? fileName : `/glslExample/${fileName}`,
+        path: import.meta.env.MODE === "development" ? filePath : `/glslExample${filePath.replace(/^\./, "")}`,
+        img: import.meta.env.MODE === "development" ? `/images/${fileName}.png` : `/glslExample/images/${fileName}.png`,
       });
     }
   }
@@ -251,8 +252,9 @@ render(0);
 // 处理点击事件
 async function handleClick(item){
   canvas.destory();
+  console.log(path)
   try {
-    let fragmentShader = await fetch(item.path).then(res => res.text());
+    let fragmentShader = await fetch(path).then(res => res.text());
     fragmentShader = await handleInclude(fragmentShader)
   
     canvas = new Canvas({
@@ -280,11 +282,18 @@ async function handleInclude(fragmentShader){
        let libPath = item.match(/"(.*)"/)[1];
        // 把相对路径转换为绝对路径
        if(libPath.startsWith("./")){
-         libPath = libPath.replace(/^\.\//, "fragment/");
+        import.meta.env.MODE === "development" ? 
+          libPath = libPath.replace(/^\.\//, "fragment/") :
+          libPath = libPath.replace(/^\.\//, "/glslExample/fragment/");
+         
        } else if(libPath.startsWith("../")){
-         libPath = libPath.replace(/^(\.\.\/)/, "/");
+        import.meta.env.MODE === "development" ?
+          libPath = libPath.replace(/^(\.\.\/)/, "/") : 
+          libPath = libPath.replace(/^(\.\.\/)/, "/glslExample/");
        } else {
-         libPath = "fragment/" + libPath;
+        import.meta.env.MODE === "development" ?
+          libPath = "fragment/" + libPath : 
+          libPath = "/glslExample/fragment/" + libPath;
        }
        const res = await fetch(libPath).then(res => res.text());
        fragmentShader = fragmentShader.replace(item, `\n${res}\n`)
