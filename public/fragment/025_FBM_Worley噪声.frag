@@ -10,7 +10,7 @@ vec2 random2d(vec2 coord){
               fract(sin(dot(coord.yx, vec2(8.9899, 79.235))) * 85.8355));
 }
 
-// 柏林噪声
+// worley噪声
 float noise2d(vec2 uv){
   vec2 iUv = floor(uv);
   vec2 fUv = fract(uv); // 范围永远是0-1
