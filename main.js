@@ -103,7 +103,6 @@ class Canvas {
   size = 2;
   vertexShader = `
   attribute vec2 a_position;
-  attribute vec2 a_texCoord;
 
   void main() {
     vec2 zeroToOne = a_position;
@@ -249,7 +248,7 @@ class Canvas {
     
     // 创建图片缓冲区
     const image = new Image();
-    image.src = "/src/assets/leaves.jpg"; // 设置图片路径
+    image.src = "/src/assets/B.jpg"; // 设置图片路径
     image.onload = () => {
       // 图像数据y轴翻转
       this.gl.pixelStorei(this.gl.UNPACK_FLIP_Y_WEBGL, true);
